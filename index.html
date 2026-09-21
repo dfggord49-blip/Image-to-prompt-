@@ -3,41 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image to Prompt & Gemini Chat</title>
+    <title>Image to Prompt Converter</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-        }
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background-color: #1e1e1e;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        }
-        h2 { text-align: center; }
-        p { color: #bbb; font-size: 14px; text-align: center; }
-        input[type="file"] { margin: 15px 0; width: 100%; }
+        body { font-family: Arial, sans-serif; background: #121212; color: #fff; text-align: center; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 12px; }
+        input, button { width: 100%; margin-top: 15px; padding: 12px; border-radius: 8px; border: none; box-sizing: border-box; }
+        button { background: #4f46e5; color: white; font-weight: bold; cursor: pointer; }
         img { max-width: 100%; margin-top: 15px; border-radius: 8px; display: none; }
         #result { margin-top: 15px; padding: 10px; background: #2a2a2a; border-radius: 8px; word-wrap: break-word; text-align: left; }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #3b3b98;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        button:hover { background-color: #575fc0; }
     </style>
 </head>
 <body>
@@ -51,12 +24,12 @@
 
     <button onclick="generatePrompt()">Prompt ထုတ်မည်</button>
 
-    <div id="result">Prompt ထုတ်ယူရန် စောင့်ဆိုင်းပါ...</div>
-    <button id="chatBtn" style="display:none; background: #10ac84;" onclick="goToGemini()">Gemini နဲ့ ကိုယ်တိုင် စကားပြောမည်</button>
+    <div id="result">Prompt ဤနေရာတွင် ပေါ်လာပါမည်...</div>
+    <button id="chatBtn" style="display:none; background:#10b981;" onclick="goToGemini()">Gemini နဲ့ တိုက်ရိုက် စကားပြောမည်</button>
 </div>
 
 <script>
-    const API_KEY = "AQ.Ab8RN6J2qkxkNCGq6xt6sablRhgKzv0Yupi97xkETM4vWivPOA";
+    const API_KEY = "AQ.Ab8RN6J2qkxkNcGq6xt6sablRhgKzvDYup197xRETW4wW1vPDA";
     let generatedPromptText = "";
 
     function previewImage(event) {
@@ -71,7 +44,7 @@
         const chatBtn = document.getElementById('chatBtn');
 
         if (!fileInput.files[0]) {
-            alert("ကျေးဇူးပြု၍ ဓာတ်ပုံ ရွေးချယ်ပါ");
+            alert("ကျေးဇူးပြု၍ ဓာတ်ပုံ ရွေးပေးပါ");
             return;
         }
 
@@ -96,8 +69,8 @@
 
             try {
                 const response = await fetch(url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
@@ -110,15 +83,17 @@
                 } else if (data.error) {
                     resultDiv.innerText = "API Error: " + data.error.message;
                 } else {
-                    resultDiv.innerText = "API မှ အကြောင်းပြန်ချက်မရရှိပါ (API Key သက်တမ်းကုန်လွန်ခြင်း သို့မဟုတ် VPN ကြောင့် ဖြစ်နိုင်ပါသည်)";
+                    resultDiv.innerText = "API မှ အကြောင်းပြန်ချက် မရရှိပါ။";
                 }
             } catch (err) {
-                resultDiv.innerText = "Error ဖြစ်ပေါ်ခဲ့ပါသည်: " + err.message;
+                resultDiv.innerText = "Error တက်သွားပါသည်: " + err.message;
             }
         };
     }
 
     function goToGemini() {
+        navigator.clipboard.writeText(generatedPromptText);
+        alert("Prompt ကို Copy ကူးလိုက်ပါပြီ!");
         window.open("https://gemini.google.com", "_blank");
     }
 </script>
