@@ -61,7 +61,7 @@
             const payload = {
                 contents: [{
                     parts: [
-                        { text: "Analyze this image in extreme detail and convert it into a highly descriptive AI image generation prompt (subject, lighting, color, background, photography style, camera angle)." },
+                        { text: "Analyze this image in extreme detail and convert it into a highly descriptive AI image generation prompt." },
                         { inline_data: { mime_type: mimeType, data: base64Data } }
                     ]
                 }]
@@ -74,10 +74,16 @@
                     body: JSON.stringify(payload)
                 });
                 const data = await response.json();
-                generatedPromptText = data.candidates[0].content.parts[0].text;
                 
-                resultDiv.innerText = generatedPromptText;
-                chatBtn.style.display = 'block';
+                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    generatedPromptText = data.candidates[0].content.parts[0].text;
+                    resultDiv.innerText = generatedPromptText;
+                    chatBtn.style.display = 'block';
+                } else if (data.error) {
+                    resultDiv.innerText = "API Error: " + data.error.message;
+                } else {
+                    resultDiv.innerText = "API မှ အဖြေမရရှိပါ။ (API Key သက်တမ်းကုန်သွားခြင်း သို့မဟုတ် VPN ကြောင့် ဖြစ်နိုင်ပါသည်။)";
+                }
             } catch (err) {
                 resultDiv.innerText = "Error တက်သွားပါသည်: " + err.message;
             }
