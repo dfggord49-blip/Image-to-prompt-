@@ -1,1 +1,96 @@
 https://github.com/dfggord49-blip/Image-to-prompt-.git
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to Prompt & Gemini AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #121212; color: #fff; text-align: center; }
+        .container { max-width: 500px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 12px; }
+        input, button { width: 100%; margin-top: 15px; padding: 12px; border-radius: 8px; border: none; box-sizing: border-box; }
+        button { background: #4f46e5; color: white; font-weight: bold; cursor: pointer; }
+        img { max-width: 100%; margin-top: 15px; border-radius: 8px; display: none; }
+        #result { margin-top: 15px; padding: 10px; background: #2a2a2a; border-radius: 8px; word-wrap: break-word; text-align: left; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Image to Prompt Converter</h2>
+    <p>ပုံတစ်ပုံ တင်လိုက်တာနဲ့ Gemini က Prompt ထုတ်ပေးပါမယ်</p>
+    
+    <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)">
+    <img id="preview">
+    
+    <button onclick="generatePrompt()">Prompt ထုတ်မည်</button>
+
+    <div id="result">Prompt ဤနေရာတွင် ပေါ်လာပါမည်...</div>
+    <button id="chatBtn" style="display:none; background:#10b981;" onclick="goToGemini()">Gemini နဲ့ တိုက်ရိုက် စကားပြောမည်</button>
+</div>
+
+<script>
+    const API_KEY = "ဒီနေရာမှာ_သင့်၏_GEMINI_API_KEY_ကိုထည့်ပါ";
+    let generatedPromptText = "";
+
+    function previewImage(event) {
+        const img = document.getElementById('preview');
+        img.src = URL.createObjectURL(event.target.files[0]);
+        img.style.display = 'block';
+    }
+
+    async function generatePrompt() {
+        const fileInput = document.getElementById('imageInput');
+        const resultDiv = document.getElementById('result');
+        const chatBtn = document.getElementById('chatBtn');
+
+        if (!fileInput.files[0]) {
+            alert("ကျေးဇူးပြု၍ ပုံတစ်ပုံ ရွေးပေးပါ");
+            return;
+        }
+
+        resultDiv.innerText = "Prompt ထုတ်ယူနေပါသည်... ခဏစောင့်ပါ...";
+
+        const reader = new FileReader();
+        reader.readAsDataURL(fileInput.files[0]);
+        reader.onloadend = async () => {
+            const base64Data = reader.result.split(',')[1];
+            const mimeType = fileInput.files[0].type;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+            const payload = {
+                contents: [{
+                    parts: [
+                        { text: "Analyze this image in extreme detail and convert it into a highly descriptive AI image generation prompt (subject, lighting, color, background, photography style, camera angle)." },
+                        { inline_data: { mime_type: mimeType, data: base64Data } }
+                    ]
+                }]
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                generatedPromptText = data.candidates[0].content.parts[0].text;
+                
+                resultDiv.innerText = generatedPromptText;
+                chatBtn.style.display = 'block';
+            } catch (err) {
+                resultDiv.innerText = "Error တက်သွားပါသည်: " + err.message;
+            }
+        };
+    }
+
+    function goToGemini() {
+        navigator.clipboard.writeText(generatedPromptText);
+        alert("Prompt ကို Copy ကူးလိုက်ပါပြီ! Gemini ထဲ ရောက်ရင် Paste လုပ်ပြီး ချက်ချင်း မေးနိုင်ပါပြီ။");
+        window.location.href = "https://gemini.google.com/app";
+    }
+</script>
+
+</body>
+</html>
